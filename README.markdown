@@ -2,7 +2,9 @@ LuaAnet - Lua bindings to anet library (from redis project)
 
 ### Compilation
 
-Use [premake](http://industriousone.com/premake) to generate appropriate build files. E.g run `premake4 gmake` to generate a Makefile. Then execute `make config=release32` or `make config=release64` to compile.
+Use luarocks to compile and install:
+
+    $ [sudo] luarocks make
 
 ### Usage:
 

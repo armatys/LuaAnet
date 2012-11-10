@@ -1,3 +1,5 @@
 Makefile
 build/**/*
 .DS_Store?
+*.so
+*.o

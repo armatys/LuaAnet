@@ -35,15 +35,24 @@
 #define ANET_ERR -1
 #define ANET_ERR_LEN 256
 
+#if defined(__sun)
+#define AF_LOCAL AF_UNIX
+#endif
+
 int anetTcpConnect(char *err, const char *addr, int port);
 int anetTcpNonBlockConnect(char *err, const char *addr, int port);
+int anetUnixConnect(char *err, char *path);
+int anetUnixNonBlockConnect(char *err, char *path);
 int anetRead(int fd, char *buf, int count);
 int anetResolve(char *err, const char *host, char *ipbuf);
 int anetTcpServer(char *err, int port, const char *bindaddr);
-int anetAccept(char *err, int serversock, char *ip, int *port);
-int anetWrite(int fd, const char *buf, int count);
+int anetUnixServer(char *err, char *path, mode_t perm);
+int anetTcpAccept(char *err, int serversock, char *ip, int *port);
+int anetUnixAccept(char *err, int serversock);
+int anetWrite(int fd, char *buf, int count);
 int anetNonBlock(char *err, int fd);
 int anetTcpNoDelay(char *err, int fd);
 int anetTcpKeepAlive(char *err, int fd);
+int anetPeerToString(int fd, char *ip, int *port);
 
 #endif
