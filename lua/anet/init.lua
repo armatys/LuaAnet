@@ -41,8 +41,8 @@ end
 --- Accept a new connection on listening socket.
 -- @param fd NUMBER socket file descriptor
 -- @return NIL or NUMBER client file descriptor
--- @return NUMBER or STRING port of the client or error message
--- @return STRING or NUMBER IP of the client or error code
+-- @return STRING IP of the client or error message
+-- @return NUMBER port of the client or error code
 function accept(fd)
   if not canDoAsync() then
     return anetc.accept(fd, true, true)
