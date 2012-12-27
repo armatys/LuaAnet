@@ -6,15 +6,9 @@ local usePerun = true
 local response = "HTTP/1.1 200 OK\r\nContent-Length: 14\r\nConnection: close\r\nContent-Type: text/plain\r\n\r\nHello world!\r\n"
 
 local function write_response(cfd)
-  local max = #response
-  local i = 1
-  while i <= max do
-    local written, errmsg, errcode = anet.write(cfd, string.sub(response, i))
-    if not written then
-      print("Write error", errmsg)
-      break
-    end
-    i = i + written
+  local written, errmsg, errcode = anet.writeall(cfd, response, i)
+  if not written then
+    print("Write error", errmsg)
   end
   anet.close(cfd)
 end

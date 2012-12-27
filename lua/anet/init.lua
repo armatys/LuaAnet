@@ -23,20 +23,19 @@
 local anetc = require 'anetc'
 local coroutine = require 'coroutine'
 local handlers = nil
+local perun = nil
 
 pcall(function()
-  local perun = require 'perun'
-  if perun then
-    handlers = require 'anet.handlers'
-    perun.register(handlers)
-  end
+  perun = require 'perun'
+  handlers = require 'anet.handlers'
+  perun.register(handlers)
 end)
 
 local _M = {}
 setfenv(1, _M)
 
 local function canDoAsync()
-  return coroutine.running() ~= nil and handlers
+  return perun and perun.supported()
 end
 
 --- Accept a new connection on listening socket.
@@ -167,6 +166,40 @@ function write(fd, msg)
     name = 'write',
     fd = fd,
     msg = msg
+  }
+  return coroutine.yield(event)
+end
+
+--- Write a message to a socket.
+-- @param fd NUMBER socket file descriptor
+-- @param msg STRING bytes to write
+-- @return NIL or NUMBER of bytes written
+-- @return STRING error message
+-- @return NUMBER error code
+function writeall(fd, msg)
+  if not canDoAsync() then
+    local written = 0
+    local max = #msg
+
+    while written < max do
+      local nwritten, errmsg, err = anetc.write(fd, msg)
+      if not nwritten then
+        return nwritten, errmsg, err
+      end
+      if nwritten == 0 then
+        return written
+      end
+      written = written + nwritten
+    end
+    return written
+  end
+
+  local event = {
+    family = handlers.family,
+    name = 'writeall',
+    fd = fd,
+    msg = msg,
+    written = 0
   }
   return coroutine.yield(event)
 end

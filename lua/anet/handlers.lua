@@ -21,6 +21,7 @@
 --]]
 
 local anetc = require 'anetc'
+local string = require 'string'
 
 local _M = {}
 setfenv(1, _M)
@@ -67,6 +68,31 @@ function write(event, perun, thread)
       write(event, perun, thread)
     else
       perun.spawn(thread, nwritten, errmsg, err)
+    end
+  end
+
+  perun.setlistener(event.fd, perun.Event.write, clb)
+  return true
+end
+
+function writeall(event, perun, thread)
+  local clb = function(evtype, id)
+    local nwritten, errmsg, err = anetc.write(event.fd, string.sub(event.msg, event.written + 1))
+    if err and err == anetc.EAGAIN then
+      writeall(event, perun, thread)
+    elseif err then
+      perun.spawn(thread, nwritten, errmsg, err)
+    else
+      if nwritten == 0 then
+        perun.spawn(thread, event.written)
+      else
+        event.written = event.written + nwritten
+        if event.written >= #event.msg then
+          perun.spawn(thread, event.written)
+        else
+          writeall(event, perun, thread)
+        end
+      end
     end
   end
 

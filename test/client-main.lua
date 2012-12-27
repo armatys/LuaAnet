@@ -12,7 +12,7 @@ function main()
     return
   end
 
-  anet.write(fd, "GET / HTTP/1.1\r\nHost: www.makenika.pl\r\n\r\n")
+  anet.writeall(fd, "GET / HTTP/1.1\r\nHost: www.makenika.pl\r\n\r\n")
 
   local shouldRead = true
   local settings = {
@@ -54,7 +54,7 @@ end
 
 if usePerun then
   perun.spawn(main)
-  perun.loop()
+  perun.main()
 else
   main()
 end
